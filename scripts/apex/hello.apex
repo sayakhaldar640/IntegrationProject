@@ -12,8 +12,8 @@
 // Id recordId = '0015j00000c2J3DAAU';
 // OpenCageGeocoderUtil.forwardGeoCoding(recordId);
 
-Id recordId = '0015j00000c2J3DAAU';
-OpenCageGeocoderUtil.reverseGeoCoding(recordId);
+// Id recordId = '0015j00000c2J3DAAU';
+// OpenCageGeocoderUtil.reverseGeoCoding(recordId);
 
 
 // Account acc = [SELECT Id, Name, Location__Latitude__s, Location__Longitude__s, ShippingState, ShippingCity, ShippingPostalCode, ShippingStreet, ShippingCountry 
@@ -24,3 +24,7 @@ OpenCageGeocoderUtil.reverseGeoCoding(recordId);
 
 // System.debug('Location: '+location);
 // System.debug('Encoded Location: '+ encLocation);
+
+// FreshdeskUtil.createContact('Sayak Haldar', 'sayakhaldar641@gmail.com', '033-98765567', '9187867899');
+
+FreshdeskUtil.createTicket('Checking for Integration Learning', 'Test Ticket', 'sayakhaldar641@gmail.com', 1, 2, 1);
