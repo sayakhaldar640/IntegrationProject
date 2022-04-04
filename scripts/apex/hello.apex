@@ -27,4 +27,6 @@
 
 // FreshdeskUtil.createContact('Sayak Haldar', 'sayakhaldar641@gmail.com', '033-98765567', '9187867899');
 
-FreshdeskUtil.createTicket('Checking for Integration Learning', 'Test Ticket', 'sayakhaldar641@gmail.com', 1, 2, 1);
+// FreshdeskUtil.createTicket('Checking for Integration Learning', 'Test Ticket', 'sayakhaldar641@gmail.com', 1, 2, 1);
+
+FreshdeskUtil.listAllContacts();
