@@ -94,64 +94,85 @@ public with sharing class FreshdeskUtil {
 
     }
 
-    public static void listAllContacts(){
+    public static void listAllTickets(){
 
         String errorMessage = '';
-        String endpoint = CONTACT_ENDPOINT;
-        String cred = System.Label.FreshDeskApi;
-
+        String endPoint     = TICKET_ENDPOINT;
+        String cred = System.Label.FreshDeskApi; // base64Encode(username:password)
+        
         Http http = new Http();
-        HttpRequest request = new HttpRequest();
-        request.setMethod('GET');
-        request.setEndpoint(endpoint);
-        request.setHeader('Content-Type', 'application/json');
-        request.setHeader('Authorization','Basic '+EncodingUtil.base64Encode(Blob.valueOf(cred)));
-
+        httpRequest httpReq = new httpRequest();
+        httpReq.setMethod('GET');
+        httpReq.setEndpoint(endPoint);
+        httpReq.setHeader('Content-Type', 'application/json');
+        httpReq.setHeader('Authorization', 'Basic '+EncodingUtil.base64Encode(Blob.valueOf(cred)));
         HttpResponse response = new HttpResponse();
-
+        
         try{
-            response = Http.send(request);
-            if(response.getStatusCode() == 200){
-                String responseBody = response.getBody();
-                System.debug(System.LoggingLevel.DEBUG, 'Response from server: '+responseBody);
-                List<FreshdeskContacts> contacts = (List<FreshdeskContacts>) System.JSON.deserialize(responseBody, List<FreshdeskContacts>.class);
-                Integer count = 1;
-                List<Contact> conList = new List<Contact>();
-                for(FreshdeskContacts contact : contacts){
-                    Contact con = new Contact(LastName=contact.name);
-                    con.FirstName = 'FreshDesk '+count;
-                    con.Description = contact.description;
-                    con.Email = contact.email;
-                    con.Department = contact.custom_fields.department;
-                    con.Title = contact.job_title;
-                    con.Phone = contact.phone;
-                    con.MobilePhone = contact.mobile;
-                    conList.add(con);
-                    count++;
-                    if(count >= 5)
-                        break;
+             response = http.send(httpReq);
+            if( response.getStatusCode() == 200 ){
+                String body = response.getBody();
+                System.debug(System.LoggingLevel.DEBUG, ' Responsse from Server '+body);
+                List<FreshdeskTicket> tickets = (List<FreshdeskTicket>)System.JSON.deserialize(body, List<FreshdeskTicket>.class);
+                for(FreshdeskTicket ticket : tickets){
+                    // upsert Fr_Ticket__c record here
                 }
-                System.debug('Contact List Size: '+ conList.size());
-                if(conList != Null && conList.size() > 0){
-                    System.debug(System.LoggingLevel.DEBUg, 'Contact List Size: '+conList.size());
-                    insert conList;
-                }
-                
-            } else {
-                errorMessage = 'Unexpected error while communicating with FreshDesk API.'+
-                                'Status: '+response.getStatus() + ' and Status Code: '+ response.getStatusCode();
-                System.debug(System.LoggingLevel.DEBUG, 'Error Message: '+ errorMessage);
+                System.debug(System.LoggingLevel.DEBUG, ' Responsse from Server '+tickets);
+            }else{
+                errorMessage = 'Unexpected Error while communicating with API. '
+                    +'Status '+response.getStatus()+' and Status Code '+response.getStatuscode();
+                System.debug(System.LoggingLevel.DEBUG, 'Exeception Executed '+errorMessage);
             }
-        } catch(System.Exception ex){
-            if(String.valueOf(ex.getMessage()).startsWith('Unauthorized endpoint')){
-                errorMessage = 'Unauthorized endpoint: An Administrator must go to Setup -> Security Control ->'+
-                               ' Remote Site Settings and add '+ ' '+ endpoint + ' Endpoint';
-            } else {
-                errorMessage = 'Unexpected error while communicating with FreshDesk API: '+
-                                'Status: '+ response.getStatus() + ' and Status Code: '+ response.getStatusCode();
+        }catch(System.Exception e){
+            if(String.valueOf(e.getMessage()).startsWith('Unauthorized endpoint')){
+                errorMessage = 'Unauthorize endpoint: An Administer must go to Setup -> Administer -> Security Control ->'
+                    +' Remote Site Setting and add '+' '+ endPoint +' Endpoint';
+            }else{
+                errorMessage = 'Unexpected Error while communicating with API. '
+                    +'Status '+response.getStatus()+' and Status Code '+response.getStatuscode();
             }
-            System.debug(System.LoggingLevel.DEBUG, 'Error Message: '+errorMessage);
-        }
-
+            System.debug(System.LoggingLevel.DEBUG, 'Exeception Executed '+errorMessage);
+        } 
     }
+
+    public static void listCustomerTickets(String email){
+
+        String errorMessage = '';
+		String endPoint = TICKET_ENDPOINT+'?email='+EncodingUtil.urlEncode(email, 'UTF-8');
+        String cred = System.Label.FreshDeskApi;
+        
+        Http http = new Http();
+        httpRequest httpReq = new httpRequest();
+        httpReq.setMethod('GET');
+        httpReq.setEndpoint(endPoint);
+        httpReq.setHeader('Content-Type', 'application/json');
+        httpReq.setHeader('Authorization', 'Basic '+EncodingUtil.base64Encode(Blob.valueOf(cred)));
+        HttpResponse response = new HttpResponse();
+        
+        try{
+             response = http.send(httpReq);
+            if( response.getStatusCode() == 200 ){
+                String body = response.getBody();
+                System.debug(System.LoggingLevel.DEBUG, ' Responsse from Server '+body);
+                List<FreshdeskTicket> tickets = (List<FreshdeskTicket>)System.JSON.deserialize(body, List<FreshdeskTicket>.class);
+                for(FreshdeskTicket ticket : tickets){
+                    // upsert Fr_Ticket__c record here
+                }
+            }else{
+                errorMessage = 'Unexpected Error while communicating with API. '
+                    +'Status '+response.getStatus()+' and Status Code '+response.getStatuscode();
+                System.debug(System.LoggingLevel.DEBUG, 'Exeception Executed '+errorMessage);
+            }
+        }catch(System.Exception e){
+            if(String.valueOf(e.getMessage()).startsWith('Unauthorized endpoint')){
+                errorMessage = 'Unauthorize endpoint: An Administer must go to Setup -> Administer -> Security Control ->'
+                    +' Remote Site Setting and add '+' '+ endPoint +' Endpoint';
+            }else{
+                errorMessage = 'Unexpected Error while communicating with API. '
+                    +'Status '+response.getStatus()+' and Status Code '+response.getStatuscode();
+            }
+            System.debug(System.LoggingLevel.DEBUG, 'Exeception Executed '+errorMessage);
+        } 
+    }
+
 }
