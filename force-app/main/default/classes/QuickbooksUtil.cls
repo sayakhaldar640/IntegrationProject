@@ -1,6 +1,6 @@
 public class QuickbooksUtil {
 
-    public String quickBooksQuery() {
+    public static String quickBooksQuery() {
         String query = SOQLUtil.buildSOQLQuery('qb_Metadata__mdt', System.Label.QuickbookSandbox);
         return query;
     }
